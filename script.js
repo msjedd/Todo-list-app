@@ -19,7 +19,6 @@ const addTask = function (task) {
   const listItem = document.createElement("li");
   const taskText = document.createElement("span");
   taskText.textContent = task;
-  const span = document.querySelector("span");
   listItem.appendChild(taskText);
 
   createCheckBox(listItem, taskText);
@@ -34,11 +33,7 @@ const addTask = function (task) {
 const createCheckBox = function (listItem, taskText) {
   const checkbox = document.createElement("input");
   checkbox.type = "checkbox";
-  // checkbox.id = "check";
-  // checkbox.width = "3rem";
   listItem.appendChild(checkbox);
-
-  // listItem.appendChild(status);
 
   checkbox.addEventListener("change", function () {
     this.checked
@@ -47,7 +42,7 @@ const createCheckBox = function (listItem, taskText) {
   });
 };
 
-const editButton = function (listItem, taskText) {
+const editButton = function (listItem, deleteButton) {
   const editButton = document.createElement("button");
   editButton.textContent = "Edit";
   listItem.appendChild(editButton);
@@ -60,7 +55,6 @@ const editButton = function (listItem, taskText) {
       input.value = span.textContent;
       listItem.insertBefore(input, span);
       listItem.removeChild(span);
-
       editButton.textContent = "Save";
     } else if (e.target.textContent == "Save") {
       const input = listItem.firstElementChild;
@@ -70,47 +64,23 @@ const editButton = function (listItem, taskText) {
       listItem.removeChild(input);
       editButton.textContent = "Edit";
     }
-    // const isEditing = listItem.classList.contains("editing");
-    // if (isEditing) {
-    //   taskText.textContent = this.value;
-    //   console.log(this);
-    //   listItem.classList.remove("editing");
-    //   editButton.textContent = "Edit";
-    // } else {
-    //   const input = document.createElement("input");
-    //   input.type = "text";
-    //   input.value = taskText.textContent;
-    //   listItem.insertBefore(input, taskText);
-    //   listItem.removeChild(taskText);
-    //   listItem.classList.add("editing");
-    //   editButton.textContent = "Save";
-    // }
   });
 };
 
 const saveTasksToLocalStorage = function () {
   const allTasks = [];
   const taskTexts = document.querySelectorAll("#todo-list li");
-  taskTexts.forEach((taskT) => {
-    const text = taskT.querySelector("span").textContent;
-
+  taskTexts.forEach((taskText) => {
+    const text = taskText.querySelector("span").textContent;
     allTasks.push(text);
-    console.log(allTasks);
   });
 
   localStorage.setItem("todoTasks", JSON.stringify(allTasks));
-
-  // let todoTasks = [];
-  // const todoJson = localStorage.getItem("todoTasks");
-  // if (todoJson) {
-  //   todoTasks = JSON.parse(todosJson);
-  // }
 };
 
-const savedTasks = JSON.parse(localStorage.getItem("todoTasks")) || [];
 const renderSave = function () {
   document.addEventListener("DOMContentLoaded", function () {
-    // console.log(savedTasks);
+    const savedTasks = JSON.parse(localStorage.getItem("todoTasks")) || [];
     savedTasks.forEach((task) => {
       addTask(task);
     });
@@ -122,24 +92,18 @@ renderSave();
 const deleteButton = function (listItem) {
   const deleteButton = document.createElement("button");
   deleteButton.textContent = "Delete";
-  // console.log(listItem);
   listItem.appendChild(deleteButton);
 
   deleteButton.addEventListener("click", function (e) {
     todoList.removeChild(listItem);
-    // console.log(allTasks);
 
     if (localStorage.getItem("todoTasks") === null) {
       return; // no items saved, nothing to delete
     }
-    const deleted = e.target.parentNode.firstChild.textContent;
-    console.log(deleted);
-    let items = JSON.parse(localStorage.getItem("todoTasks"));
-    // console.log(items);
+    const deleteTaskItem = e.target.parentNode.firstChild.textContent;
 
-    const notDeleted = items.filter((item) => item !== deleted);
-    console.log(notDeleted);
-    localStorage.setItem("todoTasks", JSON.stringify(notDeleted));
-    // console.log(localStorage.todoTasks);
+    let items = JSON.parse(localStorage.getItem("todoTasks"));
+    const remainingTasks = items.filter((item) => item !== deleteTaskItem);
+    localStorage.setItem("todoTasks", JSON.stringify(remainingTasks));
   });
 };
